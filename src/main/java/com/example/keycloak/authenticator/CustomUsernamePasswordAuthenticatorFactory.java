@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class CustomAuthenticatorFactory implements AuthenticatorFactory {
+public class CustomUsernamePasswordAuthenticatorFactory implements AuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "custom-authenticator";
-    private static final CustomAuthenticator SINGLETON = new CustomAuthenticator();
+    public static final String PROVIDER_ID = "simple-password-authenticator";
+    private static final CustomUsernamePasswordAuthenticator SINGLETON = new CustomUsernamePasswordAuthenticator();
 
     @Override
     public String getId() {
@@ -24,17 +24,17 @@ public class CustomAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getDisplayType() {
-        return "Custom Authentication Step";
+        return "Simple Username/Password";
     }
 
     @Override
     public String getHelpText() {
-        return "Custom authenticator that provides an additional authentication step after username/password";
+        return "Validates username and password";
     }
 
     @Override
     public String getReferenceCategory() {
-        return "custom";
+        return "password";
     }
 
     @Override
@@ -68,16 +68,13 @@ public class CustomAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public void init(Config.Scope config) {
-
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
     }
 
     @Override
     public void close() {
-
     }
 }

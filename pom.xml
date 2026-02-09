@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example.keycloak</groupId>
@@ -11,17 +12,18 @@
     <packaging>jar</packaging>
 
     <name>Keycloak Custom Authenticator</name>
-    <description>Custom authenticator for Keycloak 24.0.5</description>
+    <description>Custom username + password authenticator for Keycloak 24</description>
 
     <properties>
+        <java.version>17</java.version>
+        <keycloak.version>24.0.5</keycloak.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <keycloak.version>24.0.5</keycloak.version>
     </properties>
 
     <dependencies>
-        <!-- Keycloak Server SPI -->
+
+        <!-- Keycloak SPI -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi</artifactId>
@@ -29,7 +31,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Keycloak Server SPI Private -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi-private</artifactId>
@@ -37,7 +38,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Keycloak Services -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
@@ -45,32 +45,51 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Keycloak Core -->
+        <!-- Jakarta APIs (required for compilation) -->
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <version>${keycloak.version}</version>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
+
+            <!-- Java 17 compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <release>17</release>
                 </configuration>
             </plugin>
+
+            <!-- Build JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>
