@@ -33,7 +33,7 @@ public class CustomUsernamePasswordAuthenticator implements Authenticator {
         String username = formData.getFirst(USERNAME_FIELD);
         String password = formData.getFirst(PASSWORD_FIELD);
 
-        // Validate username
+
         if (username == null || username.trim().isEmpty()) {
             Response challenge = context.form()
                     .setError("missingUsernameMessage")
@@ -42,8 +42,8 @@ public class CustomUsernamePasswordAuthenticator implements Authenticator {
             return;
         }
 
-        // Validate password
-        if (password == null || password.trim().isEmpty()) {
+
+           if (password == null || password.trim().isEmpty()) {
             Response challenge = context.form()
                     .setError("missingPasswordMessage")
                     .createForm(LOGIN_FORM);
