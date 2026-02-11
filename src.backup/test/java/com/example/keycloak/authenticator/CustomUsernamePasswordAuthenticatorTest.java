@@ -8,38 +8,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
-import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class CustomUsernamePasswordAuthenticatorTest {
 
-    @Mock AuthenticationFlowContext context;
-    @Mock KeycloakSession session;
-    @Mock RealmModel realm;
-    @Mock UserModel user;
-    @Mock LoginFormsProvider loginFormsProvider;
+    @Mock
+    AuthenticationFlowContext context;
 
-    @Spy
+    @Mock
+    KeycloakSession session;
+
+    @Mock
+    RealmModel realm;
+
+    @Mock
+    UserModel user;
+
+    @InjectMocks
     CustomUsernamePasswordAuthenticator authenticator;
 
     @BeforeEach
     void setup() {
         when(context.getSession()).thenReturn(session);
         when(context.getRealm()).thenReturn(realm);
-
-        when(context.form()).thenReturn(loginFormsProvider);
-        when(loginFormsProvider.createLoginUsernamePassword())
-                .thenReturn(mock(Response.class));
     }
 
     private void mockForm(String username, String password) {
@@ -68,9 +66,9 @@ class CustomUsernamePasswordAuthenticatorTest {
     void testDisabledUser() {
         mockForm("user", "pass");
 
-        UserProvider provider = mock(UserProvider.class);
-        when(session.users()).thenReturn(provider);
-        when(provider.getUserByUsername(realm, "user")).thenReturn(user);
+        UserProvider userProvider = mock(UserProvider.class);
+        when(session.users()).thenReturn(userProvider);
+        when(userProvider.getUserByUsername(realm, "user")).thenReturn(user);
         when(user.isEnabled()).thenReturn(false);
 
         authenticator.action(context);
@@ -85,13 +83,15 @@ class CustomUsernamePasswordAuthenticatorTest {
     void testInvalidPassword() {
         mockForm("user", "wrong");
 
-        UserProvider provider = mock(UserProvider.class);
-        when(session.users()).thenReturn(provider);
-        when(provider.getUserByUsername(realm, "user")).thenReturn(user);
+        UserProvider userProvider = mock(UserProvider.class);
+        when(session.users()).thenReturn(userProvider);
+        when(userProvider.getUserByUsername(realm, "user")).thenReturn(user);
         when(user.isEnabled()).thenReturn(true);
 
-        doReturn(false).when(authenticator)
-                .validatePassword(eq(user), anyString());
+        // ✅ Mock credentialManager from user
+        var credentialManager = mock(UserCredentialManager.class);
+        when(user.credentialManager()).thenReturn(credentialManager);
+        when(credentialManager.isValid(any(), any())).thenReturn(false);
 
         authenticator.action(context);
 
@@ -105,17 +105,11 @@ class CustomUsernamePasswordAuthenticatorTest {
     void testSuccessfulAuthentication() {
         mockForm("user", "pass");
 
-        UserProvider provider = mock(UserProvider.class);
-        when(session.users()).thenReturn(provider);
-        when(provider.getUserByUsername(realm, "user")).thenReturn(user);
+        UserProvider userProvider = mock(UserProvider.class);
+        when(session.users()).thenReturn(userProvider);
+        when(userProvider.getUserByUsername(realm, "user")).thenReturn(user);
         when(user.isEnabled()).thenReturn(true);
 
-        doReturn(true).when(authenticator)
-                .validatePassword(eq(user), anyString());
-
-        authenticator.action(context);
-
-        verify(context).setUser(user);
-        verify(context).success();
-    }
-}
+        var credentialManager = mock(UserCredentialManager.class);
+        when(user.credentialManager()).thenReturn(credentialManager);
+        when(credentialManager.isValid(any(), any())).thenRetur

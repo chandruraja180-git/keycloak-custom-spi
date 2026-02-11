@@ -11,7 +11,8 @@ import org.keycloak.provider.ProviderConfigProperty;
 import java.util.Collections;
 import java.util.List;
 
-public class CustomUsernamePasswordAuthenticatorFactory implements AuthenticatorFactory {
+public class CustomUsernamePasswordAuthenticatorFactory
+        implements AuthenticatorFactory {
 
     public static final String PROVIDER_ID = "custom-username-password";
 
@@ -30,7 +31,7 @@ public class CustomUsernamePasswordAuthenticatorFactory implements Authenticator
 
     @Override
     public String getHelpText() {
-        return "Validates username and password using custom logic.";
+        return "Custom username and password authentication";
     }
 
     @Override
@@ -48,13 +49,10 @@ public class CustomUsernamePasswordAuthenticatorFactory implements Authenticator
         return false;
     }
 
-    // 🔥 IMPORTANT: This enables Alternative option in UI
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
-        return new AuthenticationExecutionModel.Requirement[] {
-                AuthenticationExecutionModel.Requirement.REQUIRED,
-                AuthenticationExecutionModel.Requirement.ALTERNATIVE,
-                AuthenticationExecutionModel.Requirement.DISABLED
+        return new AuthenticationExecutionModel.Requirement[]{
+                AuthenticationExecutionModel.Requirement.REQUIRED
         };
     }
 

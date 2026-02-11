@@ -1,10 +1,12 @@
 package com.example.keycloak.authenticator;
 
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.credential.CredentialInput;
+import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.models.*;
 
 public class CustomUsernamePasswordAuthenticator implements Authenticator {
@@ -52,25 +54,19 @@ public class CustomUsernamePasswordAuthenticator implements Authenticator {
             return;
         }
 
-        boolean valid = validatePassword(user, password);
+        // ✅ UNIVERSAL SAFE PASSWORD VALIDATION
+        CredentialInput credentialInput =
+                UserCredentialModel.password(password);
 
-        if (!valid) {
+        if (!(user instanceof CredentialInputValidator validator) ||
+                !validator.isValid(realm, user, credentialInput)) {
+
             fail(context, AuthenticationFlowError.INVALID_CREDENTIALS);
             return;
         }
 
         context.setUser(user);
         context.success();
-    }
-
-    protected boolean validatePassword(UserModel user,
-                                       String password) {
-
-        CredentialInput credentialInput =
-                UserCredentialModel.password(password);
-
-        return user.credentialManager()
-                .isValid(credentialInput);
     }
 
     private void fail(AuthenticationFlowContext context,
