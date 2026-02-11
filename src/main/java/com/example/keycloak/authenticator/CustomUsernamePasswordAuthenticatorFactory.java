@@ -48,7 +48,7 @@ public class CustomUsernamePasswordAuthenticatorFactory implements Authenticator
         return false;
     }
 
-    // 🔥 IMPORTANT: This enables Alternative option in UI
+
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
         return new AuthenticationExecutionModel.Requirement[] {
